@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
-import VartProfileArtifact from "../../../artifacts/contracts/VartProfile.sol/VartProfile.json";
+import { VART_ABI } from "../contracts/VartProfileAbi";
 import { BOT_CHAIN } from "../constants/network";
 
-export const VART_ABI = VartProfileArtifact.abi;
+export { VART_ABI };
 export const DEPLOYED_VART_CONTRACT_ADDRESS = "0x545B697201cB19DdFF7d68FBd60158dc454aaef7";
 
 /**
