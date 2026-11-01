@@ -1,5 +1,5 @@
 /**
- * Exact ABI entries for VartProfile compiled artifact on BOT Chain Bohr Testnet.
+ * Exact ABI entries for VartProfile compiled artifact on BOT Chain Mainnet / Bohr Testnet.
  * Sourced directly from artifacts/contracts/VartProfile.sol/VartProfile.json.
  */
 export const VART_ABI = [

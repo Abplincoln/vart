@@ -58,7 +58,7 @@ export default function ProfileCard({
               target="_blank"
               rel="noreferrer"
               className="vart-link-address"
-              title="View on Bohr Explorer"
+              title={`View on ${BOT_CHAIN.chainName} Explorer`}
             >
               {address} ↗
             </a>

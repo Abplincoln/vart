@@ -4,9 +4,18 @@ Customizable on-chain identity platform on BOT Chain.
 
 ## Overview
 
-Vart provides customizable on-chain identity infrastructure built on BOT Chain Bohr Testnet.
+Vart provides customizable on-chain identity infrastructure built on BOT Chain.
 
-- **Target Network:** BOT Chain Bohr Testnet
+### BOT Chain Mainnet (Default Active Network)
+- **Target Network:** BOT Chain Mainnet
+- **Chain ID:** `677`
+- **RPC URL:** `https://rpc.botchain.ai`
+- **Block Explorer:** `https://scan.botchain.ai`
+- **Native Currency:** BOT
+- **Deployed Contract (`VartProfile`):** [`0xdCAA90a36Ba5B87E3079ED7ceb0E24aB86d18aD5`](https://scan.botchain.ai/address/0xdCAA90a36Ba5B87E3079ED7ceb0E24aB86d18aD5)
+
+### BOT Chain Bohr Testnet (Reference)
+- **Network Name:** BOT Chain Bohr Testnet
 - **Chain ID:** `968`
 - **RPC URL:** `https://rpc.bohr.life`
 - **Block Explorer:** `https://scan.bohr.life`
