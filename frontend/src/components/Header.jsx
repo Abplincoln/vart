@@ -23,7 +23,7 @@ export default function Header({
           <div className="vart-logo-icon">V</div>
           <div className="vart-brand-text">
             <span className="vart-brand-title">Vart</span>
-            <span className="vart-brand-badge">Bohr Testnet</span>
+            <span className="vart-brand-badge">{BOT_CHAIN.chainName}</span>
           </div>
         </div>
 
@@ -41,7 +41,7 @@ export default function Header({
             isCorrectNetwork ? (
               <span className="vart-pill vart-pill-success">
                 <span className="vart-dot vart-dot-success"></span>
-                BOT Chain (968)
+                {BOT_CHAIN.chainName} ({BOT_CHAIN.chainId})
               </span>
             ) : (
               <button
@@ -49,7 +49,7 @@ export default function Header({
                 className="vart-btn vart-btn-sm vart-btn-warning"
                 onClick={onSwitchNetwork}
               >
-                Switch to BOT Chain (968)
+                Switch to {BOT_CHAIN.chainName} ({BOT_CHAIN.chainId})
               </button>
             )
           )}

@@ -159,7 +159,7 @@ export default function ProfileForm({
                 rel="noreferrer"
                 className="vart-link-underline"
               >
-                View on Bohr Explorer ({txState.txHash.slice(0, 10)}...) ↗
+                View on Explorer ({txState.txHash.slice(0, 10)}...) ↗
               </a>
             )}
           </div>
@@ -204,7 +204,7 @@ export default function ProfileForm({
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().trim())}
-              placeholder="e.g. satoshi_968"
+              placeholder="e.g. satoshi"
               maxLength={20}
               className={`vart-input ${username && usernameError ? "vart-input-invalid" : ""}`}
               disabled={isSubmitting}

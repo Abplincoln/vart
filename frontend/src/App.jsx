@@ -34,7 +34,7 @@ export default function App() {
 
   // Local override for testing contract address without rebuilding
   const [customContractAddress, setCustomContractAddress] = useState("");
-  const effectiveContractAddress = getContractAddress(customContractAddress);
+  const effectiveContractAddress = getContractAddress(customContractAddress, chainId);
   const isContractReady = Boolean(effectiveContractAddress);
 
   const isCorrectNetwork = Number(chainId) === BOT_CHAIN.chainId;
@@ -52,7 +52,7 @@ export default function App() {
       setGlobalError("");
 
       try {
-        const contract = getReadOnlyContract(effectiveContractAddress);
+        const contract = getReadOnlyContract(effectiveContractAddress, chainId);
         if (!contract) return;
 
         const exists = await contract.profileExists(userAddress);
@@ -71,7 +71,7 @@ export default function App() {
         setProfileLoading(false);
       }
     },
-    [isContractReady, effectiveContractAddress]
+    [isContractReady, effectiveContractAddress, chainId]
   );
 
   // Initialize wallet connection listeners
@@ -249,14 +249,14 @@ export default function App() {
             <div className="vart-alert vart-alert-warning">
               <div>
                 <strong>Incorrect Network Detected:</strong> You are connected to chain ID{" "}
-                {chainId}. Vart operates on BOT Chain Bohr Testnet (Chain ID 968).
+                {chainId}. Vart operates on {BOT_CHAIN.chainName} (Chain ID {BOT_CHAIN.chainId}).
               </div>
               <button
                 type="button"
                 className="vart-btn vart-btn-sm vart-btn-warning"
                 onClick={handleSwitchNetwork}
               >
-                Switch Network
+                Switch to {BOT_CHAIN.chainName} ({BOT_CHAIN.chainId})
               </button>
             </div>
           </div>
@@ -272,7 +272,7 @@ export default function App() {
                   Customizable Digital Identity on <span className="vart-gradient-text">BOT Chain</span>
                 </h1>
                 <p className="vart-hero-description">
-                  Vart is a self-sovereign identity protocol for BOT Chain Bohr Testnet.
+                  Vart is a self-sovereign identity protocol for {BOT_CHAIN.chainName}.
                   Claim your unique on-chain username and design your customizable vector
                   avatar stored and verified completely on-chain.
                 </p>
@@ -296,13 +296,13 @@ export default function App() {
 
                 <div className="vart-hero-network-info">
                   <span className="vart-info-item">
-                    <strong>Network:</strong> Bohr Testnet
+                    <strong>Network:</strong> {BOT_CHAIN.chainName}
                   </span>
                   <span className="vart-info-item">
-                    <strong>Chain ID:</strong> 968
+                    <strong>Chain ID:</strong> {BOT_CHAIN.chainId}
                   </span>
                   <span className="vart-info-item">
-                    <strong>Gas Token:</strong> BOT
+                    <strong>Gas Token:</strong> {BOT_CHAIN.nativeCurrency.symbol}
                   </span>
                 </div>
               </div>
@@ -446,15 +446,15 @@ export default function App() {
           </div>
           <div className="vart-footer-links">
             <a
-              href="https://scan.bohr.life"
+              href={BOT_CHAIN.explorerUrl}
               target="_blank"
               rel="noreferrer"
               className="vart-footer-link"
             >
-              Bohr Explorer ↗
+              {BOT_CHAIN.chainName} Explorer ↗
             </a>
             <a
-              href="https://rpc.bohr.life"
+              href={BOT_CHAIN.rpcUrl}
               target="_blank"
               rel="noreferrer"
               className="vart-footer-link"

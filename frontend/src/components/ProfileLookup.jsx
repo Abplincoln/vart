@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import ProfileCard from './ProfileCard';
 import { getReadOnlyContract, parseContractError } from '../utils/contract';
+import { BOT_CHAIN } from '../constants/network';
 
 export default function ProfileLookup({ overrideAddress = "" }) {
   const [query, setQuery] = useState("");
@@ -69,7 +70,7 @@ export default function ProfileLookup({ overrideAddress = "" }) {
       <div className="vart-card vart-lookup-card">
         <h3 className="vart-card-title">Explore On-Chain Identities</h3>
         <p className="vart-card-subtitle">
-          Search for any registered profile on BOT Chain Bohr Testnet by wallet address or username.
+          Search for any registered profile on {BOT_CHAIN.chainName} by wallet address or username.
         </p>
 
         <form onSubmit={handleSearch} className="vart-lookup-form">

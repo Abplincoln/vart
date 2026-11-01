@@ -1,78 +1,123 @@
 import { ethers } from "ethers";
 import { VART_ABI } from "../contracts/VartProfileAbi";
-import { BOT_CHAIN } from "../constants/network";
+import {
+  BOT_CHAIN,
+  BOT_CHAIN_MAINNET,
+  BOT_CHAIN_TESTNET,
+  SUPPORTED_NETWORKS,
+} from "../constants/network";
 
 export { VART_ABI };
-export const DEPLOYED_VART_CONTRACT_ADDRESS = "0x545B697201cB19DdFF7d68FBd60158dc454aaef7";
+
+// Canonical deployed addresses
+export const MAINNET_VART_CONTRACT_ADDRESS = "0xdCAA90a36Ba5B87E3079ED7ceb0E24aB86d18aD5";
+export const TESTNET_VART_CONTRACT_ADDRESS = "0x545B697201cB19DdFF7d68FBd60158dc454aaef7";
+
+// Default active deployed address (BOT Chain Mainnet)
+export const DEPLOYED_VART_CONTRACT_ADDRESS = MAINNET_VART_CONTRACT_ADDRESS;
 
 /**
- * Get configured contract address from environment variable, fallback override, or canonical deployed address.
+ * Returns the network configuration matching a chain ID (defaults to active BOT_CHAIN).
  */
-export function getContractAddress(overrideAddress = "") {
+export function getNetworkForChainId(chainId) {
+  if (chainId && SUPPORTED_NETWORKS[Number(chainId)]) {
+    return SUPPORTED_NETWORKS[Number(chainId)];
+  }
+  return BOT_CHAIN;
+}
+
+/**
+ * Get configured contract address from override, environment variable, or canonical network deployed address.
+ * Optionally resolves according to the active chain ID.
+ * Prevents any stale testnet address in environment variables from overriding the Mainnet contract.
+ */
+export function getContractAddress(overrideAddress = "", currentChainId = null) {
+  // 1. Explicit user manual override input from UI
   if (overrideAddress && ethers.isAddress(overrideAddress)) {
     return overrideAddress;
   }
+
+  // 2. If connected to Bohr Testnet, route to testnet contract address
+  if (currentChainId && Number(currentChainId) === BOT_CHAIN_TESTNET.chainId) {
+    return TESTNET_VART_CONTRACT_ADDRESS;
+  }
+
+  // 3. Environment variable configuration
   const envAddress = import.meta.env.VITE_VART_CONTRACT_ADDRESS || "";
-  if (envAddress && ethers.isAddress(envAddress) && envAddress !== ethers.ZeroAddress) {
+  // Safety guard: Ensure a stale testnet address in env cannot accidentally override Mainnet
+  if (
+    envAddress &&
+    ethers.isAddress(envAddress) &&
+    envAddress !== ethers.ZeroAddress &&
+    envAddress.toLowerCase() !== TESTNET_VART_CONTRACT_ADDRESS.toLowerCase()
+  ) {
     return envAddress;
   }
-  return DEPLOYED_VART_CONTRACT_ADDRESS;
+
+  // 4. Default to canonical BOT Chain Mainnet contract address
+  return MAINNET_VART_CONTRACT_ADDRESS;
 }
 
 /**
  * Check whether a contract address is configured.
  */
-export function isContractConfigured(overrideAddress = "") {
-  return Boolean(getContractAddress(overrideAddress));
+export function isContractConfigured(overrideAddress = "", currentChainId = null) {
+  return Boolean(getContractAddress(overrideAddress, currentChainId));
 }
 
 /**
- * Returns a read-only provider for BOT Chain Bohr Testnet.
+ * Returns a read-only provider for the target network (defaults to active BOT_CHAIN).
  */
-export function getReadOnlyProvider() {
-  return new ethers.JsonRpcProvider(BOT_CHAIN.rpcUrl, {
-    name: BOT_CHAIN.chainName,
-    chainId: BOT_CHAIN.chainId,
+export function getReadOnlyProvider(network = BOT_CHAIN) {
+  return new ethers.JsonRpcProvider(network.rpcUrl, {
+    name: network.chainName,
+    chainId: network.chainId,
   });
 }
 
 /**
  * Returns a read-only instance of the VartProfile contract.
  */
-export function getReadOnlyContract(overrideAddress = "") {
-  const address = getContractAddress(overrideAddress);
+export function getReadOnlyContract(overrideAddress = "", currentChainId = null) {
+  const targetNetwork = getNetworkForChainId(currentChainId);
+  const address = getContractAddress(overrideAddress, targetNetwork.chainId);
   if (!address) return null;
-  const provider = getReadOnlyProvider();
+  const provider = getReadOnlyProvider(targetNetwork);
   return new ethers.Contract(address, VART_ABI, provider);
 }
 
 /**
  * Returns a signer-connected instance of the VartProfile contract.
  */
-export async function getSignerContract(overrideAddress = "") {
-  const address = getContractAddress(overrideAddress);
-  if (!address) {
-    throw new Error("Vart contract address is not configured.");
-  }
+export async function getSignerContract(overrideAddress = "", currentChainId = null) {
   if (!window.ethereum) {
     throw new Error("No Web3 wallet detected. Please install MetaMask.");
   }
   const browserProvider = new ethers.BrowserProvider(window.ethereum);
+  const network = await browserProvider.getNetwork();
+  const connectedChainId = Number(network.chainId);
+
+  const activeChainId = currentChainId || connectedChainId;
+  const address = getContractAddress(overrideAddress, activeChainId);
+  if (!address) {
+    throw new Error("Vart contract address is not configured.");
+  }
+
   const signer = await browserProvider.getSigner();
   return new ethers.Contract(address, VART_ABI, signer);
 }
 
 /**
- * Request MetaMask to switch to or add the BOT Chain Bohr Testnet.
+ * Request MetaMask to switch to or add the target BOT Chain network (defaults to Mainnet).
  */
-export async function switchOrAddBotChain() {
+export async function switchOrAddBotChain(targetNetwork = BOT_CHAIN) {
   if (!window.ethereum) {
     throw new Error("MetaMask is not installed.");
   }
   try {
     await window.ethereum.request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: BOT_CHAIN.chainIdHex }],
+      params: [{ chainId: targetNetwork.chainIdHex }],
     });
     return true;
   } catch (switchError) {
@@ -89,11 +134,11 @@ export async function switchOrAddBotChain() {
         method: "wallet_addEthereumChain",
         params: [
           {
-            chainId: BOT_CHAIN.chainIdHex,
-            chainName: BOT_CHAIN.chainName,
-            nativeCurrency: BOT_CHAIN.nativeCurrency,
-            rpcUrls: [BOT_CHAIN.rpcUrl],
-            blockExplorerUrls: [BOT_CHAIN.explorerUrl],
+            chainId: targetNetwork.chainIdHex,
+            chainName: targetNetwork.chainName,
+            nativeCurrency: targetNetwork.nativeCurrency,
+            rpcUrls: [targetNetwork.rpcUrl],
+            blockExplorerUrls: [targetNetwork.explorerUrl],
           },
         ],
       });
@@ -194,10 +239,10 @@ export function parseContractError(error) {
 
   // Common network or RPC messages
   if (rawMsg.includes("insufficient funds")) {
-    return "Insufficient BOT token balance to pay gas fees on BOT Chain Bohr Testnet.";
+    return `Insufficient BOT token balance to pay gas fees on ${BOT_CHAIN.chainName}.`;
   }
   if (rawMsg.includes("network") || rawMsg.includes("fetch")) {
-    return "Network error connecting to BOT Chain RPC (https://rpc.bohr.life). Please check your connection.";
+    return `Network error connecting to BOT Chain RPC (${BOT_CHAIN.rpcUrl}). Please check your connection.`;
   }
 
   return rawMsg || "Transaction failed. Please check the inputs and your wallet balance.";
