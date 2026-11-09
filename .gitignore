@@ -6,8 +6,6 @@ dist/
 .vite/
 
 # Environment files
-.env
-.env.*
 !.env.example
 
 # Hardhat build & test artifacts
@@ -27,5 +25,5 @@ yarn-error.log*
 # OS / Editor files
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
+config.bat
