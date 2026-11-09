@@ -285,12 +285,12 @@ export default function App() {
                     Connect Wallet to Begin
                   </button>
                   <a
-                    href="https://dev-docs.botchain.ai/docs/Developers/quick-guide/"
+                    href={BOT_CHAIN.websiteUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="vart-btn vart-btn-secondary vart-btn-lg"
                   >
-                    BOT Chain Docs ↗
+                    BOT Chain Website ↗
                   </a>
                 </div>
 
@@ -304,6 +304,14 @@ export default function App() {
                   <span className="vart-info-item">
                     <strong>Gas Token:</strong> {BOT_CHAIN.nativeCurrency.symbol}
                   </span>
+                  <a
+                    href={BOT_CHAIN.websiteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="vart-info-item vart-info-link"
+                  >
+                    <strong>Ecosystem:</strong> BOT Chain Website ↗
+                  </a>
                 </div>
               </div>
 
@@ -439,12 +447,38 @@ export default function App() {
       <footer className="vart-footer">
         <div className="vart-container vart-footer-inner">
           <div className="vart-footer-col">
-            <span className="vart-brand-title">Vart</span>
+            <div className="vart-footer-brand-row">
+              <a
+                href={BOT_CHAIN.websiteUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="vart-footer-botchain-badge"
+                title="BOT Chain Official Website"
+              >
+                <img
+                  src="/brand/botchain-footer-logo.png"
+                  alt="BOT Chain Logo"
+                  className="vart-footer-botchain-logo"
+                  height="26"
+                  width="118"
+                />
+              </a>
+              <span className="vart-footer-divider">•</span>
+              <span className="vart-brand-title">Vart</span>
+            </div>
             <p className="vart-footer-tagline">
               Customizable On-Chain Identity Protocol on BOT Chain.
             </p>
           </div>
           <div className="vart-footer-links">
+            <a
+              href={BOT_CHAIN.websiteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="vart-footer-link vart-footer-link-highlight"
+            >
+              BOT Chain Website ↗
+            </a>
             <a
               href={BOT_CHAIN.explorerUrl}
               target="_blank"
